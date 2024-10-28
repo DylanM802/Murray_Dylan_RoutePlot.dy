@@ -1,0 +1,72 @@
+def load_route(filename):
+    """Load the route instructions from a file."""
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+    return [line.strip() for line in lines if line.strip()]
+
+def plot_route(instructions):
+    """Plot the route based on the instructions."""
+    # Initialize the grid and starting position
+    grid_size = 12
+    x, y = int(instructions[0]), int(instructions[1])
+    route = [(x, y)]
+    
+    # Validate start position
+    if not (0 <= x < grid_size and 0 <= y < grid_size):
+        return None, "Error: The route is outside of the grid"
+
+    # Process the route directions
+    for direction in instructions[2:]:
+        if direction == 'N':
+            y -= 1
+        elif direction == 'S':
+            y += 1
+        elif direction == 'E':
+            x += 1
+        elif direction == 'W':
+            x -= 1
+        else:
+            continue  # Ignore invalid directions
+
+        # Check if position is still within bounds
+        if not (0 <= x < grid_size and 0 <= y < grid_size):
+            return None, "Error: The route is outside of the grid"
+        
+        route.append((x, y))
+    
+    return route, None
+
+def print_grid(route):
+    """Print the grid with the route plotted."""
+    grid_size = 12
+    grid = [['.' for _ in range(grid_size)] for _ in range(grid_size)]
+
+    for (x, y) in route:
+        grid[y][x] = 'X'  # Mark the path
+
+    for row in reversed(grid):
+        print(' '.join(row))
+        
+def main():
+    while True:
+        filename = input("Enter the next route instructions file or enter STOP to finish: ")
+        if filename.upper() == 'STOP':
+            break
+
+        try:
+            instructions = load_route(filename)
+            route, error = plot_route(instructions)
+
+            if error:
+                print(error)
+            else:
+                print("Route coordinates:", route)
+                print_grid(route)
+
+        except FileNotFoundError:
+            print(f"Error: The file '{filename}' does not exist.")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+
+if __name__ == "__main__":
+    main()
